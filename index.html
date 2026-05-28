@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Url Shortener | Rút Gọn Link & Thống Kê Chi Tiết</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-link logo-icon"></i>
+                <span class="logo-text">Url<span>Shortener</span></span>
+            </div>
+            <nav class="nav-tabs">
+                <button class="tab-btn active" data-tab="shorten-tab">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Rút gọn Link
+                </button>
+                <button class="tab-btn" data-tab="stats-tab" id="nav-stats-btn">
+                    <i class="fa-solid fa-chart-simple"></i> Thống kê
+                </button>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- SECTION 1: SHORTEN URL -->
+            <section id="shorten-tab" class="tab-content active">
+                <div class="card hero-card">
+                    <div class="card-header">
+                        <h1>Rút gọn liên kết của bạn</h1>
+                        <p class="subtitle">Tạo liên kết ngắn gọn, dễ chia sẻ và theo dõi hiệu suất của chúng.</p>
+                    </div>
+
+                    <form id="shorten-form" class="shorten-form">
+                        <div class="input-group">
+                            <label for="original-url"><i class="fa-solid fa-globe"></i> Nhập URL gốc</label>
+                            <div class="input-wrapper">
+                                <input type="url" id="original-url" placeholder="https://example.com/very-long-path-name-to-shorten" required>
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+
+                        <!-- Collapse Button for Options -->
+                        <button type="button" class="btn-toggle-options" id="toggle-options-btn">
+                            <span>Tùy chọn nâng cao</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+
+                        <!-- Advanced Options Container -->
+                        <div class="advanced-options" id="advanced-options">
+                            <div class="options-grid">
+                                <div class="input-group">
+                                    <label for="custom-key"><i class="fa-solid fa-signature"></i> Đường dẫn tùy chỉnh (Tối đa 10 ký tự)</label>
+                                    <div class="input-wrapper prefix-wrapper">
+                                        <span class="input-prefix">key/</span>
+                                        <input type="text" id="custom-key" placeholder="my-alias" maxlength="10">
+                                        <span class="focus-border"></span>
+                                    </div>
+                                    <small class="helper-text">Ví dụ: nạp 'sales' sẽ cho ra: domain/sales</small>
+                                </div>
+                                <div class="input-group">
+                                    <label for="expire-date"><i class="fa-solid fa-calendar-days"></i> Ngày hết hạn (Tùy chọn)</label>
+                                    <div class="input-wrapper">
+                                        <input type="datetime-local" id="expire-date">
+                                        <span class="focus-border"></span>
+                                    </div>
+                                    <small class="helper-text">Sau ngày này, link sẽ không hoạt động</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="btn-shorten-submit">
+                            <span class="btn-text">Rút gọn ngay</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <!-- Alert message container -->
+                    <div id="shorten-alert" class="alert hidden"></div>
+
+                    <!-- Result Panel -->
+                    <div id="result-panel" class="result-panel hidden">
+                        <div class="result-divider"></div>
+                        <h3 class="result-title"><i class="fa-solid fa-circle-check"></i> Rút gọn thành công!</h3>
+                        
+                        <div class="result-card">
+                            <div class="result-info">
+                                <div class="url-display">
+                                    <span class="url-label">Link rút gọn:</span>
+                                    <div class="copy-box">
+                                        <input type="text" id="shortened-url-display" readonly>
+                                        <button class="btn-copy" id="btn-copy-url" title="Sao chép vào clipboard">
+                                            <i class="fa-regular fa-copy"></i>
+                                            <span class="tooltip-text">Sao chép</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="url-display original-display">
+                                    <span class="url-label">Link gốc:</span>
+                                    <a href="#" id="original-url-display" target="_blank" rel="noopener noreferrer">https://example.com</a>
+                                </div>
+                            </div>
+
+                            <div class="qr-container">
+                                <div id="qrcode-box" class="qrcode-box">
+                                    <!-- QR Code SVG or Image will be rendered here -->
+                                    <img id="qr-image" src="" alt="QR Code" style="display: none;">
+                                    <div id="qr-placeholder" class="qr-placeholder">
+                                        <i class="fa-solid fa-qrcode"></i>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-secondary" id="btn-view-stats-direct">
+                                    <i class="fa-solid fa-chart-line"></i> Xem thống kê link này
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: STATS -->
+            <section id="stats-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h1>Phân tích & Thống kê liên kết</h1>
+                        <p class="subtitle">Theo dõi số lượt click, phân loại thiết bị và xu hướng truy cập theo thời gian.</p>
+                    </div>
+
+                    <!-- Search Key Form -->
+                    <form id="stats-search-form" class="stats-search-form">
+                        <div class="search-input-group">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" id="stats-search-key" placeholder="Nhập mã rút gọn (Ví dụ: 000001 hoặc custom-key)" required>
+                            <button type="submit" class="btn-search">Tra cứu</button>
+                        </div>
+                    </form>
+
+                    <!-- Alert message container for stats -->
+                    <div id="stats-alert" class="alert hidden"></div>
+
+                    <!-- Loading Spinner -->
+                    <div id="stats-loader" class="loader-container hidden">
+                        <div class="spinner"></div>
+                        <p>Đang tải dữ liệu thống kê...</p>
+                    </div>
+
+                    <!-- Stats Dashboard Layout -->
+                    <div id="stats-dashboard" class="stats-dashboard hidden">
+                        <!-- Overview Cards -->
+                        <div class="stats-grid-overview">
+                            <div class="metric-card">
+                                <div class="metric-icon clicks-icon">
+                                    <i class="fa-solid fa-mouse-pointer"></i>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-title">Tổng số lượt Click</span>
+                                    <h2 class="metric-value" id="stat-total-clicks">0</h2>
+                                </div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-icon link-icon">
+                                    <i class="fa-solid fa-link"></i>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-title">Mã rút gọn</span>
+                                    <h2 class="metric-value" id="stat-short-key">-</h2>
+                                </div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-icon status-icon" id="stat-status-icon-container">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </div>
+                                <div class="metric-details">
+                                    <span class="metric-title">Trạng thái Link</span>
+                                    <h2 class="metric-value" id="stat-status-text">Hoạt động</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- URL Details Card -->
+                        <div class="detail-card">
+                            <h3><i class="fa-solid fa-circle-info"></i> Thông tin chi tiết liên kết</h3>
+                            <div class="detail-row">
+                                <span class="detail-label">Đường dẫn gốc:</span>
+                                <a href="#" id="stat-original-url" class="detail-value text-truncate" target="_blank" rel="noopener noreferrer">-</a>
+                            </div>
+                        </div>
+
+                        <!-- Charts Grid -->
+                        <div class="charts-grid">
+                            <!-- Left: Trend Chart -->
+                            <div class="chart-card">
+                                <h3><i class="fa-solid fa-chart-line"></i> Xu hướng truy cập theo ngày</h3>
+                                <div class="chart-container">
+                                    <canvas id="trendChart"></canvas>
+                                </div>
+                            </div>
+                            <!-- Right: Device Distribution Chart -->
+                            <div class="chart-card">
+                                <h3><i class="fa-solid fa-laptop-mobile"></i> Thiết bị truy cập</h3>
+                                <div class="chart-container">
+                                    <canvas id="deviceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+        </footer>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
