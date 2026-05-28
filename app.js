@@ -1,5 +1,6 @@
 // Backend API configuration
-const API_BASE_URL = 'http://localhost:5088';
+// const API_BASE_URL = 'http://localhost:5088';
+const API_BASE_URL = 'https://url-shortener-tlsz.onrender.com';
 
 // Global variables for Chart instances
 let trendChartInstance = null;
